@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/statistics-service/statistics-service.iml" filepath="$PROJECT_DIR$/statistics-service/statistics-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/url-shortener-microservices.iml" filepath="$PROJECT_DIR$/.idea/url-shortener-microservices.iml" />
     </modules>
   </component>

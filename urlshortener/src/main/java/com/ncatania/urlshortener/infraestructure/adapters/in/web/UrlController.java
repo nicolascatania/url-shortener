@@ -52,7 +52,7 @@ public class UrlController {
     }
 
 
-    @GetMapping("/{shortCode}")
+    @GetMapping("/short-code/{shortCode}")
     public ResponseEntity<UrlResponse> getUrlByShortCode(
             @PathVariable String shortCode,
             HttpServletRequest request) {
