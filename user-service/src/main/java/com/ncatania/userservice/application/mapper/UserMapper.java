@@ -1,4 +1,4 @@
-package com.ncatania.userservice.infraestructure.mapper;
+package com.ncatania.userservice.application.mapper;
 
 import com.ncatania.userservice.application.dto.UserRequest;
 import com.ncatania.userservice.application.dto.UserResponse;

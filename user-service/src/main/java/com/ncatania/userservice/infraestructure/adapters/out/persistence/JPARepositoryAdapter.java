@@ -3,7 +3,7 @@ package com.ncatania.userservice.infraestructure.adapters.out.persistence;
 import com.ncatania.userservice.application.dto.UserRequest;
 import com.ncatania.userservice.application.dto.UserResponse;
 import com.ncatania.userservice.application.ports.out.UserRepositoryPort;
-import com.ncatania.userservice.infraestructure.mapper.UserMapper;
+import com.ncatania.userservice.application.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
