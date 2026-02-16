@@ -5,6 +5,7 @@ import com.ncatania.userservice.application.dto.UserResponse;
 import com.ncatania.userservice.application.ports.out.UserRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -63,7 +64,7 @@ class UserServiceTest {
     }
 
     @Test
-    void create_shouldReturnCreatedUser() {
+    void create_shouldHashPasswordBeforeSaving() {
         UserRequest request = new UserRequest("John", "john@example.com", "password123");
         UserResponse createdUser = new UserResponse(1L, "John", "john@example.com");
 
@@ -73,8 +74,14 @@ class UserServiceTest {
 
         assertNotNull(result);
         assertEquals(1L, result.id());
-        assertEquals("John", result.name());
-        verify(userRepository, times(1)).create(any(UserRequest.class));
+
+        // Verificar que la contraseña fue hasheada (capturar el argumento pasado al repositorio)
+        ArgumentCaptor<UserRequest> captor = ArgumentCaptor.forClass(UserRequest.class);
+        verify(userRepository, times(1)).create(captor.capture());
+
+        UserRequest capturedRequest = captor.getValue();
+        assertNotEquals("password123", capturedRequest.password(), "Password should be hashed");
+        assertTrue(capturedRequest.password().contains(":"), "Hashed password should contain salt:hash format");
     }
 
     @Test
