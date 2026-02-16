@@ -3,6 +3,7 @@ package com.ncatania.urlshortener.application.service;
 import com.ncatania.urlshortener.application.dto.UrlRequest;
 import com.ncatania.urlshortener.application.dto.UrlResponse;
 import com.ncatania.urlshortener.application.mapper.UrlMapper;
+import com.ncatania.urlshortener.application.port.in.GetUrlsByUserIdUseCase;
 import com.ncatania.urlshortener.application.port.in.UrlServiceUseCase;
 import com.ncatania.urlshortener.application.port.out.UrlRepositoryPort;
 import com.ncatania.urlshortener.domain.model.Url;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UrlService implements UrlServiceUseCase {
+public class UrlService implements UrlServiceUseCase, GetUrlsByUserIdUseCase {
 
     private final UrlRepositoryPort repository;
 
@@ -34,7 +35,7 @@ public class UrlService implements UrlServiceUseCase {
     @Override
     @Transactional
     public UrlResponse saveUrl(UrlRequest urlRequest) {
-        Url toSave = Url.create(urlRequest.baseUrl());
+        Url toSave = Url.create(urlRequest.baseUrl(), urlRequest.userId());
         Url saved = repository.saveUrl(toSave);
         return UrlMapper.toResponse(saved);
     }
@@ -45,4 +46,8 @@ public class UrlService implements UrlServiceUseCase {
         repository.deleteUrlById(id);
     }
 
+    @Override
+    public List<UrlResponse> getByUserId(Long userId) {
+        return repository.getUrlsByUserId(userId).stream().map(UrlMapper::toResponse).toList();
+    }
 }

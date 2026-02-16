@@ -15,4 +15,6 @@ public interface UrlRepositoryPort {
     Optional<Url> getUrlById(Long id);
     Url saveUrl(Url url);
     void deleteUrlById(Long id);
+
+    List<Url> getUrlsByUserId(Long userId);
 }

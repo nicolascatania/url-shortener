@@ -36,4 +36,10 @@ public class JpaRepositoryAdapter implements UrlRepositoryPort {
     public void deleteUrlById(Long id) {
         repository.deleteById(id);
     }
+
+    @Override
+    public List<Url> getUrlsByUserId(Long userId) {
+        return repository.getUrlsByUserId(userId)
+                .stream().map(UrlMapper::toDomain).toList();
+    }
 }

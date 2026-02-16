@@ -22,4 +22,7 @@ public class UrlEntity {
 
     private String shortUrl;
 
+    @Column(nullable = false)
+    private Long userId;
+
 }

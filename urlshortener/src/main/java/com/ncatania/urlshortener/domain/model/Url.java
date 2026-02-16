@@ -3,10 +3,11 @@ package com.ncatania.urlshortener.domain.model;
 public record Url (
         Long id,
         String baseUrl,
-        String shortUrl
+        String shortUrl,
+        Long userId
 ) {
 
-    public static Url create(String baseUrl) {
+    public static Url create(String baseUrl, Long userId) {
         if (baseUrl == null || baseUrl.isBlank()) {
             throw new IllegalArgumentException("Base URL cannot be blank");
         }
@@ -20,7 +21,7 @@ public record Url (
             throw new IllegalArgumentException("Invalid URL");
         }
         String shortCode = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-        return new Url(null, baseUrl, shortCode);
+        return new Url(null, baseUrl, shortCode, userId);
     }
 
 }

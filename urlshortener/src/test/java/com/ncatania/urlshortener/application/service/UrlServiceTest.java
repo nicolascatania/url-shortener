@@ -28,8 +28,8 @@ class UrlServiceTest {
 
     @Test
     void saveUrl_shouldReturnSavedResponse() {
-        UrlRequest req = new UrlRequest("https://example.com");
-        when(repository.saveUrl(any())).thenReturn(new Url(1L, "https://example.com", "fixed123"));
+        UrlRequest req = new UrlRequest("https://example.com", 1L);
+        when(repository.saveUrl(any())).thenReturn(new Url(1L, "https://example.com", "fixed123", 1L));
 
         UrlResponse resp = service.saveUrl(req);
 

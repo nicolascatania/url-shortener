@@ -29,7 +29,7 @@ class JpaRepositoryAdapterIT {
 
     @Test
     void saveAndGetUrl() {
-        Url toSave = Url.create("https://example.org/test");
+        Url toSave = Url.create("https://example.org/test", 1L);
         Url saved = repository.saveUrl(toSave);
 
         assertNotNull(saved.id());

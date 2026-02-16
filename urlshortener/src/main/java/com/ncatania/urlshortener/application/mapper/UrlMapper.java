@@ -11,22 +11,22 @@ public final class UrlMapper {
 
     public static Url toDomain(UrlEntity entity) {
         if (entity == null) return null;
-        return new Url(entity.getId(), entity.getBaseUrl(), entity.getShortUrl());
+        return new Url(entity.getId(), entity.getBaseUrl(), entity.getShortUrl(), entity.getUserId());
     }
 
     public static UrlEntity toEntity(Url domain) {
         if (domain == null) return null;
-        return new UrlEntity(domain.id(), domain.baseUrl(), domain.shortUrl());
+        return new UrlEntity(domain.id(), domain.baseUrl(), domain.shortUrl(), domain.userId());
     }
 
     public static UrlResponse toResponse(Url domain) {
         if (domain == null) return null;
-        return new UrlResponse(domain.id(), domain.baseUrl(), domain.shortUrl());
+        return new UrlResponse(domain.id(), domain.baseUrl(), domain.shortUrl(), domain.userId());
     }
 
     public static Url toDomainFromRequest(UrlRequest request) {
         if (request == null) return null;
         // Use domain factory to create validated domain object
-        return Url.create(request.baseUrl());
+        return Url.create(request.baseUrl(), request.userId());
     }
 }
