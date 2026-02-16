@@ -17,4 +17,6 @@ public interface UrlRepositoryPort {
     void deleteUrlById(Long id);
 
     List<Url> getUrlsByUserId(Long userId);
+
+    Optional<Url> getUrlByShortCode(String shortCode);
 }

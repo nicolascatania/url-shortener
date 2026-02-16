@@ -42,4 +42,9 @@ public class JpaRepositoryAdapter implements UrlRepositoryPort {
         return repository.getUrlsByUserId(userId)
                 .stream().map(UrlMapper::toDomain).toList();
     }
+
+    @Override
+    public Optional<Url> getUrlByShortCode(String shortUrl) {
+        return repository.getUrlByShortUrl(shortUrl);
+    }
 }

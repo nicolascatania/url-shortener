@@ -8,4 +8,6 @@ public interface UrlServiceUseCase {
         UrlResponse getUrlById(Long id);
         UrlResponse saveUrl(UrlRequest urlRequest);
         void deleteUrlById(Long id);
+
+        UrlResponse getUrlByShortCode(String shortCode);
 }

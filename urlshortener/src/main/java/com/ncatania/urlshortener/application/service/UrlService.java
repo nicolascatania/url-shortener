@@ -47,6 +47,12 @@ public class UrlService implements UrlServiceUseCase, GetUrlsByUserIdUseCase {
     }
 
     @Override
+    public UrlResponse getUrlByShortCode(String shortCode) {
+        return repository.getUrlByShortCode(shortCode).map(UrlMapper::toResponse)
+                .orElseThrow(() -> new UrlNotFoundException("Url not found"));
+    }
+
+    @Override
     public List<UrlResponse> getByUserId(Long userId) {
         return repository.getUrlsByUserId(userId).stream().map(UrlMapper::toResponse).toList();
     }
