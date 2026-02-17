@@ -9,6 +9,7 @@ import com.ncatania.urlshortener.application.port.out.UrlRepositoryPort;
 import com.ncatania.urlshortener.domain.model.Url;
 import com.ncatania.urlshortener.infraestructure.exception.UrlNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UrlService implements UrlServiceUseCase, GetUrlsByUserIdUseCase {
 
     private final UrlRepositoryPort repository;
@@ -37,6 +39,7 @@ public class UrlService implements UrlServiceUseCase, GetUrlsByUserIdUseCase {
     public UrlResponse saveUrl(UrlRequest urlRequest) {
         Url toSave = Url.create(urlRequest.baseUrl(), urlRequest.userId());
         Url saved = repository.saveUrl(toSave);
+        log.info("Saved url: {}", saved);
         return UrlMapper.toResponse(saved);
     }
 
