@@ -17,6 +17,7 @@ public interface SpringDataClickStatisticRepository extends JpaRepository<ClickS
     @Query("SELECT new com.ncatania.statisticsservice.application.dto.TopClickedUrls(cs.shortCode, COUNT(cs)) " +
             "FROM ClickStatisticEntity cs " +
             "GROUP BY cs.shortCode " +
-            "ORDER BY COUNT(cs) DESC")
+            "ORDER BY COUNT(cs) DESC " +
+            "LIMIT 10")
     List<TopClickedUrls> getTopClickedUrls();
 }
