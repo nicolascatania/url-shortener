@@ -4,6 +4,6 @@
 .-'    | |  | \ '-'  |  |  |  .-'  `)
 `-----'  `--'  `--`--'  `--'  `----'
 
-Active profile: ${spring-profiles.active}
+Active profile: ${spring.profiles.active}
 ${application.title} ${application.version}
 Powered by Spring Boot ${spring-boot.version}
