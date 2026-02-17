@@ -16,7 +16,7 @@ public class JavaMailAdapter {
     private final JavaMailSender mailSender;
 
     public void sendWelcomeEmail(String to, String name) {
-        log.info("Sending welcome HTML email to {}", to);
+        log.debug("Sending welcome HTML email to {}", to);
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");

@@ -10,6 +10,7 @@ import com.ncatania.userservice.domain.model.UserApp;
 import com.ncatania.userservice.infraestructure.exception.UserNotFoundException;
 import com.ncatania.userservice.infraestructure.security.PasswordHasher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserServiceUseCase {
 
     private final UserRepositoryPort userRepository;
@@ -38,6 +40,7 @@ public class UserService implements UserServiceUseCase {
     @Transactional
     public UserResponse create(UserRequest userRequest) {
         // Hash password before saving
+        log.debug("Hashing password for user: {}", userRequest.email());
         String hashedPassword = PasswordHasher.hashPassword(userRequest.password());
         UserRequest secureUserRequest = new UserRequest(
                 userRequest.name(),
@@ -46,15 +49,19 @@ public class UserService implements UserServiceUseCase {
         );
 
 
+
         UserApp user = userRepository.create(UserMapper.toDomain(secureUserRequest));
+        log.info("New user created successfully with ID: {} and email: {}", user.id(), user.email());
 
         UserResponse response = UserMapper.toResponse(user);
 
+        log.debug("Publishing UserCreatedEvent for ID: {}", response.id());
         eventPublisher.publishEvent(new UserCreatedEvent(
                 response.id(),
                 response.email(),
                 response.name()
         ));
+
 
         return response;
     }
