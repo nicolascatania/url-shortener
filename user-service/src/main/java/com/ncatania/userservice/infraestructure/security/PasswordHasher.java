@@ -1,10 +1,13 @@
 package com.ncatania.userservice.infraestructure.security;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+@Slf4j
 public final class PasswordHasher {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -21,6 +24,7 @@ public final class PasswordHasher {
 
             return saltBase64 + ":" + hashBase64;
         } catch (NoSuchAlgorithmException e) {
+            log.error("Error during password hashing: {} ", e.getMessage());
             throw new RuntimeException("SHA-256 algorithm not available", e);
         }
     }
@@ -40,8 +44,10 @@ public final class PasswordHasher {
 
             return MessageDigest.isEqual(hash, storedHashBytes);
         } catch (IllegalArgumentException e) {
+            log.error("Error during password verification: {} ", e.getMessage());
             return false;
         } catch (NoSuchAlgorithmException e) {
+            log.error("Error during password verification, algorithm error: {} ", e.getMessage());
             throw new RuntimeException("SHA-256 algorithm not available", e);
         }
     }
