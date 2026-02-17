@@ -1,13 +1,13 @@
 package com.ncatania.userservice.infraestructure.adapters.out.persistence;
 
-import com.ncatania.userservice.application.dto.UserRequest;
-import com.ncatania.userservice.application.dto.UserResponse;
 import com.ncatania.userservice.application.ports.out.UserRepositoryPort;
 import com.ncatania.userservice.application.mapper.UserMapper;
+import com.ncatania.userservice.domain.model.UserApp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,25 +16,24 @@ public class JPARepositoryAdapter implements UserRepositoryPort {
     private final SpringDataUserAppRepository repository;
 
     @Override
-    public List<UserResponse> getAll() {
+    public List<UserApp> getAll() {
         return repository.findAll()
                 .stream()
-                .map(UserMapper::toResponse)
+                .map(UserMapper::toDomain)
                 .toList();
     }
 
     @Override
-    public UserResponse getById(Long id) {
+    public Optional<UserApp> getById(Long id) {
         return repository.findById(id)
-                .map(UserMapper::toResponse)
-                .orElse(null);
+                .map(UserMapper::toDomain);
     }
 
     @Override
-    public UserResponse create(UserRequest user) {
+    public UserApp create(UserApp user) {
         UserAppEntity entity = UserMapper.toEntity(user);
         UserAppEntity saved = repository.save(entity);
-        return UserMapper.toResponse(saved);
+        return UserMapper.toDomain(saved);
     }
 
     @Override

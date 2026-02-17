@@ -38,6 +38,11 @@ public final class UserMapper {
         return new UserApp(entity.getId(), entity.getUsername(), entity.getEmail(), entity.getPassword());
     }
 
+    public static UserApp toDomain(UserRequest request) {
+        if (request == null) return null;
+        return new UserApp(null, request.name(), request.email(), request.password());
+    }
+
     public static UserResponse toResponse(UserApp domain) {
         if (domain == null) return null;
         return new UserResponse(domain.id(), domain.name(), domain.email());

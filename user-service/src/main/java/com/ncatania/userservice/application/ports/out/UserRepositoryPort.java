@@ -1,13 +1,13 @@
 package com.ncatania.userservice.application.ports.out;
 
-import com.ncatania.userservice.application.dto.UserRequest;
-import com.ncatania.userservice.application.dto.UserResponse;
+import com.ncatania.userservice.domain.model.UserApp;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepositoryPort {
-    List<UserResponse> getAll();
-    UserResponse getById(Long id);
-    UserResponse create(UserRequest user);
+    List<UserApp> getAll();
+    Optional<UserApp> getById(Long id);
+    UserApp create(UserApp user);
     void deleteById(Long id);
 }

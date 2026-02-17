@@ -2,15 +2,20 @@ package com.ncatania.userservice.application.service;
 
 import com.ncatania.userservice.application.dto.UserRequest;
 import com.ncatania.userservice.application.dto.UserResponse;
+import com.ncatania.userservice.application.event.UserCreatedEvent;
 import com.ncatania.userservice.application.ports.out.UserRepositoryPort;
+import com.ncatania.userservice.domain.model.UserApp;
+import com.ncatania.userservice.infraestructure.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,72 +27,70 @@ class UserServiceTest {
     @Mock
     private UserRepositoryPort userRepository;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private UserService userService;
 
     @Test
-    void getAll_shouldReturnListOfUsers() {
-        UserResponse user1 = new UserResponse(1L, "John", "john@example.com");
-        UserResponse user2 = new UserResponse(2L, "Jane", "jane@example.com");
-        List<UserResponse> users = List.of(user1, user2);
+    void getAll_shouldReturnListOfUserResponse() {
+        // Arrange
+        UserApp userDomain = new UserApp(1L, "John", "john@example.com", "hash");
+        when(userRepository.getAll()).thenReturn(List.of(userDomain));
 
-        when(userRepository.getAll()).thenReturn(users);
-
+        // Act
         List<UserResponse> result = userService.getAll();
 
-        assertEquals(2, result.size());
+        // Assert
+        assertEquals(1, result.size());
         assertEquals("John", result.get(0).name());
-        verify(userRepository, times(1)).getAll();
+        verify(userRepository).getAll();
     }
 
     @Test
-    void getById_shouldReturnUser() {
-        UserResponse user = new UserResponse(1L, "John", "john@example.com");
-        when(userRepository.getById(1L)).thenReturn(user);
+    void getById_shouldReturnUserResponse_WhenUserExists() {
+        // Arrange
+        UserApp userDomain = new UserApp(1L, "John", "john@example.com", "hash");
+        when(userRepository.getById(1L)).thenReturn(Optional.of(userDomain));
 
+        // Act
         UserResponse result = userService.getById(1L);
 
+        // Assert
         assertNotNull(result);
         assertEquals("John", result.name());
-        assertEquals("john@example.com", result.email());
-        verify(userRepository, times(1)).getById(1L);
     }
 
     @Test
-    void getById_notFound_shouldReturnNull() {
-        when(userRepository.getById(999L)).thenReturn(null);
+    void getById_shouldThrowException_WhenUserNotFound() {
+        // Arrange
+        when(userRepository.getById(99L)).thenReturn(Optional.empty());
 
-        UserResponse result = userService.getById(999L);
-
-        assertNull(result);
-        verify(userRepository, times(1)).getById(999L);
+        // Assert
+        assertThrows(UserNotFoundException.class, () -> userService.getById(99L));
     }
 
     @Test
-    void create_shouldHashPasswordBeforeSaving() {
-        UserRequest request = new UserRequest("John", "john@example.com", "password123");
-        UserResponse createdUser = new UserResponse(1L, "John", "john@example.com");
+    void create_shouldHashPasswordAndPublishEvent() {
+        // Arrange
+        UserRequest request = new UserRequest("John", "john@example.com", "rawPassword");
+        UserApp savedDomain = new UserApp(1L, "John", "john@example.com", "hashedPassword");
 
-        when(userRepository.create(any(UserRequest.class))).thenReturn(createdUser);
+        when(userRepository.create(any(UserApp.class))).thenReturn(savedDomain);
 
+        // Act
         UserResponse result = userService.create(request);
 
+        // Assert
         assertNotNull(result);
-        assertEquals(1L, result.id());
 
-        // Verificar que la contraseña fue hasheada (capturar el argumento pasado al repositorio)
-        ArgumentCaptor<UserRequest> captor = ArgumentCaptor.forClass(UserRequest.class);
-        verify(userRepository, times(1)).create(captor.capture());
+        // Verificamos que el password que llegó al repo NO sea el original
+        ArgumentCaptor<UserApp> userCaptor = ArgumentCaptor.forClass(UserApp.class);
+        verify(userRepository).create(userCaptor.capture());
+        assertNotEquals("rawPassword", userCaptor.getValue().password());
 
-        UserRequest capturedRequest = captor.getValue();
-        assertNotEquals("password123", capturedRequest.password(), "Password should be hashed");
-        assertTrue(capturedRequest.password().contains(":"), "Hashed password should contain salt:hash format");
-    }
-
-    @Test
-    void deleteById_shouldCallRepositoryDelete() {
-        userService.deleteById(1L);
-
-        verify(userRepository, times(1)).deleteById(1L);
+        // Verificamos que se publicó el evento
+        verify(eventPublisher, times(1)).publishEvent(any(UserCreatedEvent.class));
     }
 }

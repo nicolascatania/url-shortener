@@ -2,29 +2,36 @@ package com.ncatania.userservice.application.service;
 
 import com.ncatania.userservice.application.dto.UserRequest;
 import com.ncatania.userservice.application.dto.UserResponse;
+import com.ncatania.userservice.application.event.UserCreatedEvent;
+import com.ncatania.userservice.application.mapper.UserMapper;
 import com.ncatania.userservice.application.ports.in.UserServiceUseCase;
 import com.ncatania.userservice.application.ports.out.UserRepositoryPort;
+import com.ncatania.userservice.domain.model.UserApp;
+import com.ncatania.userservice.infraestructure.exception.UserNotFoundException;
 import com.ncatania.userservice.infraestructure.security.PasswordHasher;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserServiceUseCase {
 
     private final UserRepositoryPort userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public List<UserResponse> getAll() {
-        return userRepository.getAll();
+        return userRepository.getAll().stream().map(UserMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
     public UserResponse getById(Long id) {
-        return userRepository.getById(id);
+        return userRepository.getById(id).map(UserMapper::toResponse).orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
     }
 
     @Override
@@ -37,7 +44,19 @@ public class UserService implements UserServiceUseCase {
                 userRequest.email(),
                 hashedPassword
         );
-        return userRepository.create(secureUserRequest);
+
+
+        UserApp user = userRepository.create(UserMapper.toDomain(secureUserRequest));
+
+        UserResponse response = UserMapper.toResponse(user);
+
+        eventPublisher.publishEvent(new UserCreatedEvent(
+                response.id(),
+                response.email(),
+                response.name()
+        ));
+
+        return response;
     }
 
     @Override
