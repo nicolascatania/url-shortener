@@ -1,4 +1,4 @@
-package com.ncatania.urlshortener;
+package com.ncatania.statisticsservice;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -11,10 +11,11 @@ import org.testcontainers.utility.DockerImageName;
 import static org.mockito.Mockito.mock;
 
 @TestConfiguration(proxyBeanMethods = false)
-public class TestcontainersConfiguration {
+class TestcontainersConfiguration {
+
     @Bean
     @ServiceConnection
-    MySQLContainer mySQLContainer() {
+    MySQLContainer mysqlContainer() {
         return new MySQLContainer(DockerImageName.parse("mysql:latest"));
     }
 
@@ -25,3 +26,4 @@ public class TestcontainersConfiguration {
     }
 
 }
+
